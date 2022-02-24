@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Add user</title>
+</head>
+<body>
+<form action="#" th:action="@{/users/add}" th:object="${user}" method="post"></form>
+<label for="name">name</label>
+<input type="text" field="*{name}" id="name" placeholder="name" name="name">
+
+<label for="email">email</label>
+<input type="text" field="*{email}" id="email" placeholder="email" name="email">
+<input type="submit" value="Add user">
+</body>
+</html>
