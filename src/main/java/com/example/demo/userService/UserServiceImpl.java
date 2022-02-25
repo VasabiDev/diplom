@@ -8,16 +8,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl {
-
     private final UserDao userDao;
-
     @Autowired
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
-    }
-
-    public User add(User user) {
-        return userDao.save(user);
     }
 
 }
