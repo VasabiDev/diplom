@@ -1,30 +1,17 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
+import com.example.demo.userDao.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import com.example.demo.userService.UserService;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.validation.Valid;
-import java.util.List;
-
-import static java.lang.String.valueOf;
 
 
 @Controller
 public class UserController {
     @Autowired
-    private UserService userService;
-
-
-
-
-
-
+    private UserDao userDao;
 
     // дофолтное отображение
     @GetMapping(value = "/")
@@ -32,79 +19,63 @@ public class UserController {
         return "test";
     }
 
-//    // показать всех пользователей
-//    @GetMapping(value = "/users")
-//    public String allUsers(ModelMap model) {
-//        List<User> userList = userService.allUsers();
-//        model.addAttribute("users", userList);
-//        return "users";
-//    }
 
     // показать всех пользователей
-    @GetMapping( "/users")
-    public String allUsers(ModelMap model) {
-        List<User> userList = userService.allUsers();
-        model.addAttribute("users", userList);
+    @GetMapping("/users")
+    public String showUserList(Model model) {
+        model.addAttribute("users", userDao.findAll());
         return "users";
     }
 
 
-
-
-
-
-
     // вызвать форму добавления пользователя
-    @GetMapping( "/users/add")
+    @GetMapping("/users/add")
     public String createUserForm(Model model) {
         model.addAttribute("user", new User());
         return "createUserForm";
     }
 
-    // добавление пользователя в базу и редирект на главную страницу
-    @PostMapping("/users/add")
-    public String createUser(User user) {
-        userService.add(user);
+    // добавить пользователя в базу из формы
+    @PostMapping("users/add")
+    public String userAddProcess(@RequestParam String name, @RequestParam String email,
+                                 @RequestParam String pass, Model model) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPass(pass);
+        userDao.save(user);
         return "redirect:/users";
     }
 
-
-
-
-
-
-
-
-
-    @PostMapping("users/edit{id}")
-    public String editUser(@PathVariable("id") int id, Model model) {
-        model.addAttribute("user", userService.getById(id));
+    // вызвать форму рездактирования пользователя
+    @GetMapping("users/edit/{id}")
+    public String showUserEditForm(@PathVariable("id") int id, Model model) {
+        User user = userDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        model.addAttribute("user", user);
         return "editUser";
     }
 
-    @PostMapping( "users/edit")
-    public String edit(@ModelAttribute("user") User user) {
-        userService.edit(user);
-        return "redirect:/";
+    // обработать данные из формы редактирования пользователя
+    @PostMapping("users/edit/{id}")
+    public String userEditProcess(@PathVariable(value = "id") int id,
+                                  @RequestParam String name, @RequestParam String email,
+                                  @RequestParam String pass, Model model) {
+        User user = userDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        user.setName(name);
+        user.setEmail(email);
+        user.setPass(pass);
+        userDao.save(user);
+        return "redirect:/users";
     }
 
-        @GetMapping("users/delete")
-        public String deleteUserById ( @PathVariable(value = "id") int id){
-            userService.delete(id);
-            return "redirect:/users";
-        }
-    @RequestMapping(value="/users/delete/{id}", method=RequestMethod.GET)
-    public ModelAndView deleteTeam(@PathVariable Integer id) {
-        ModelAndView modelAndView = new ModelAndView("users");
-        userService.delete(id);
-
-        return modelAndView;
+    // удаление пользователя из базы
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") int id, Model model) {
+        User user = userDao.findById(id)
+                .orElseThrow(() -> new RuntimeException("Invalid user Id:" + id));
+        userDao.delete(user);
+        return "redirect:/users";
     }
-        @GetMapping("users/{id}")
-        public String show ( @PathVariable("id") int id, ModelMap modelMap){
-            modelMap.addAttribute("user", userService.getById(id));
-            return "show";
-        }
-
-
 }

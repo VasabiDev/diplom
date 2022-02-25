@@ -1,16 +1,31 @@
+
+
+
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Add user</title>
+    <title>ADD NEW USER</title>
 </head>
 <body>
-<form action="#" th:action="@{/users/add}" th:object="${user}" method="post"></form>
-<label for="name">name</label>
-<input type="text" field="*{name}" id="name" placeholder="name" name="name">
+<h2 align=center>ADD NEW USER</h2>
+<div>
+    <div th:each="el : ${user}">
 
-<label for="email">email</label>
-<input type="text" field="*{email}" id="email" placeholder="email" name="email">
-<input type="submit" value="Add user">
-</body>
-</html>
+        <form method="post" align=center>
+
+            <input type="text" th:value="${user.name}" name="name" placeholder="Name">
+
+            <input type="text" th:value="${user.email}" name="email" placeholder="Email">
+
+            <input type="text" th:value="${user.pass}" name="pass" placeholder="Pass">
+
+            <button type="submit" value="Update User">Add</button>
+        </form>
+
+        <form action="#" th:action="@{/users}" align=center>
+            <button type="submit">back</button>
+        </form>
+    </div>
+</div>
+
